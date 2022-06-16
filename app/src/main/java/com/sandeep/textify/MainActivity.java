@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
         capture = findViewById(R.id.capture);
         signin = findViewById(R.id.signin);
 
+
         if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions(MainActivity.this,new String[]{
                     Manifest.permission.CAMERA
