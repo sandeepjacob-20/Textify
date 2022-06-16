@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class ResultActivity extends AppCompatActivity {
-    private Button save;
+    private Button save,upload;
     private TextView result;
     private String value;
     @Override
@@ -30,6 +30,7 @@ public class ResultActivity extends AppCompatActivity {
 
         save = findViewById(R.id.save);
         result = findViewById(R.id.result);
+        upload = findViewById(R.id.upload);
 
         value = getIntent().getExtras().getString("result");
 
@@ -39,6 +40,13 @@ public class ResultActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 createAndSaveFile();
+            }
+        });
+        upload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Intent intent = new Intent(ResultActivity.this,UploadActivity.class);
+                //startActivity(intent);
             }
         });
     }

@@ -3,8 +3,10 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/Test apps/Textify/app/src/main/res/layout/activity_main.xml" value="0.2" />
+        <entry key="..\:/Test apps/Textify/app/src/main/res/layout/activity_main.xml" value="0.33" />
         <entry key="..\:/Test apps/Textify/app/src/main/res/layout/activity_result.xml" value="0.2" />
+        <entry key="..\:/Test apps/Textify/app/src/main/res/layout/activity_singin.xml" value="0.2" />
+        <entry key="..\:/Test apps/Textify/app/src/main/res/layout/activity_upload.xml" value="0.2" />
       </map>
     </option>
   </component>

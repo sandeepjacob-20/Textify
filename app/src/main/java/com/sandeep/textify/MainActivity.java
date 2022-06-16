@@ -42,7 +42,7 @@ import java.nio.charset.StandardCharsets;
 
 public class MainActivity extends AppCompatActivity {
     private Context context;
-    private Button capture;
+    private Button capture,signin;
     private static final int request_camera_code = 100;
     private static final int request_write_storage_code = 101;
     private static final int request_read_storage_code = 102;
@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         context = this;
         capture = findViewById(R.id.capture);
-
+        signin = findViewById(R.id.signin);
 
         if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions(MainActivity.this,new String[]{
@@ -73,6 +73,13 @@ public class MainActivity extends AppCompatActivity {
                     Manifest.permission.READ_EXTERNAL_STORAGE
             },request_read_storage_code);
         }
+        signin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this,SigninActivity.class);
+                startActivity(intent);
+            }
+        });
         capture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
