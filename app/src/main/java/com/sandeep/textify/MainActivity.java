@@ -1,9 +1,5 @@
 package com.sandeep.textify;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -18,9 +14,9 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -29,142 +25,113 @@ import com.huawei.hmf.tasks.OnFailureListener;
 import com.huawei.hmf.tasks.OnSuccessListener;
 import com.huawei.hmf.tasks.Task;
 
+import com.huawei.hms.common.ApiException;
 import com.huawei.hms.mlsdk.MLAnalyzerFactory;
 import com.huawei.hms.mlsdk.common.MLFrame;
 import com.huawei.hms.mlsdk.text.MLLocalTextSetting;
 import com.huawei.hms.mlsdk.text.MLText;
 import com.huawei.hms.mlsdk.text.MLTextAnalyzer;
+import com.huawei.hms.support.account.AccountAuthManager;
+import com.huawei.hms.support.account.request.AccountAuthParams;
+import com.huawei.hms.support.account.request.AccountAuthParamsHelper;
+import com.huawei.hms.support.account.result.AuthAccount;
+import com.huawei.hms.support.account.service.AccountAuthService;
+import com.huawei.hms.support.api.entity.common.CommonConstant;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 
 public class MainActivity extends AppCompatActivity {
-    private Context context;
-    private Button capture,signin;
-    private static final int request_camera_code = 100;
-    private static final int request_write_storage_code = 101;
-    private static final int request_read_storage_code = 102;
-    private Bitmap bitmap;
-    private String value;
+    private AccountAuthService mAuthService;
+
+    // Set HUAWEI ID sign-in authorization parameters.
+    private AccountAuthParams mAuthParam;
+
+    // Define the request code for signInIntent.
+    private static final int REQUEST_CODE_SIGN_IN = 1000;
+
+    // Define the log flag.
+    private static final String TAG = "AccountTest";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        context = this;
-        capture = findViewById(R.id.capture);
-        signin = findViewById(R.id.signin);
 
-
-        if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(MainActivity.this,new String[]{
-                    Manifest.permission.CAMERA
-            },request_camera_code);
-        }
-
-        if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(MainActivity.this,new String[]{
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-            },request_write_storage_code);
-        }
-
-        if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(MainActivity.this,new String[]{
-                    Manifest.permission.READ_EXTERNAL_STORAGE
-            },request_read_storage_code);
-        }
-        signin.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.HuaweiIdAuthButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this,SigninActivity.class);
-                startActivity(intent);
+                silentSignInByHwId();
             }
         });
-        capture.setOnClickListener(new View.OnClickListener() {
+    }
+    private void silentSignInByHwId() {
+        // 1. Use AccountAuthParams to specify the user information to be obtained, including the user ID (OpenID and UnionID), email address, and profile (nickname and picture).
+        // 2. By default, DEFAULT_AUTH_REQUEST_PARAM specifies two items to be obtained, that is, the user ID and profile.
+        // 3. If your app needs to obtain the user's email address, call setEmail().
+        //  4. To support ID token-based HUAWEI ID sign-in, use setIdToken(). User information can be parsed from the ID token.
+        mAuthParam = new AccountAuthParamsHelper(AccountAuthParams.DEFAULT_AUTH_REQUEST_PARAM)
+                .setEmail()
+                .setIdToken()
+                .createParams();
+        // Use AccountAuthParams to build AccountAuthService.
+        mAuthService = AccountAuthManager.getService(this, mAuthParam);
+        // Sign in with a HUAWEI ID silently.
+        Task<AuthAccount> task = mAuthService.silentSignIn();
+        task.addOnSuccessListener(new OnSuccessListener<AuthAccount>() {
             @Override
-            public void onClick(View v) {
-                ImagePicker.with(MainActivity.this)
-                        .crop()	    			//Crop image(Optional), Check Customization for more option
-                        .compress(1024)			//Final image size will be less than 1 MB(Optional)
-                        .maxResultSize(1080, 1080)	//Final image resolution will be less than 1080 x 1080(Optional)
-                        .start();
+            public void onSuccess(AuthAccount authAccount) {
+                // The silent sign-in is successful. Process the returned AuthAccount object to obtain the HUAWEI ID information.
+                dealWithResultOfSignIn(authAccount);
             }
         });
-
-
-    }
-
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == Activity.RESULT_OK) {
-            Uri uri =  data.getData();
-            //Image Uri will not be null for RESULT_OK
-            //val uri: Uri = data?.data!!
-
-                    // Use Uri object instead of File to avoid storage permissions
-                   // imgProfile.setImageURI(fileUri)
-            try {
-                bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(),uri);
-                recognize(bitmap);
-                //result.setText(value);
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else if (resultCode == ImagePicker.RESULT_ERROR) {
-            Toast.makeText(this, ImagePicker.getError(data), Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(this, "Task Cancelled", Toast.LENGTH_SHORT).show();
-        }
-        /*if (requestCode==CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE){
-            CropImage.ActivityResult result = CropImage.getActivityResult(data);
-            if(resultCode == RESULT_OK){
-                Uri resultUri = result.getUri();*/
-
-
-    }
-
-    private void recognize(Bitmap bitmap){
-        final String[] val = new String[1];
-        MLLocalTextSetting setting = new MLLocalTextSetting.Factory()
-                .setOCRMode(MLLocalTextSetting.OCR_DETECT_MODE)
-                // Specify languages that can be recognized.
-                .setLanguage("en")
-                .create();
-        MLTextAnalyzer analyzer = MLAnalyzerFactory.getInstance().getLocalTextAnalyzer(setting);
-        //MLTextAnalyzer analyzer = new MLTextAnalyzer.Factory(MainActivity.this).create();
-        //create a bit map image first
-        MLFrame frame = MLFrame.fromBitmap(bitmap);
-
-        Task<MLText> task = analyzer.asyncAnalyseFrame(frame);
-        task.addOnSuccessListener(new OnSuccessListener<MLText>() {
-            @Override
-            public void onSuccess(MLText text) {
-                // Processing for successful recognition.
-                value = text.getStringValue();
-                Intent intent = new Intent(MainActivity.this,ResultActivity.class);
-                intent.putExtra("result",value);
-                startActivity(intent);
-            }
-        }).addOnFailureListener(new OnFailureListener() {
+        task.addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(Exception e) {
-                Toast.makeText(MainActivity.this, "Couldn't recognise text", Toast.LENGTH_SHORT).show();
-                // Processing logic for recognition failure.
+                // The silent sign-in fails. Your app will call getSignInIntent() to show the authorization or sign-in screen.
+                if (e instanceof ApiException) {
+                    ApiException apiException = (ApiException) e;
+                    Intent signInIntent = mAuthService.getSignInIntent();
+                    // If your app appears in full screen mode when a user tries to sign in, that is, with no status bar at the top of the device screen, add the following parameter in the intent:
+                    // intent.putExtra(CommonConstant.RequestParams.IS_FULL_SCREEN, true);
+                    // Check the details in this FAQ.
+                    signInIntent.putExtra(CommonConstant.RequestParams.IS_FULL_SCREEN, true);
+                    startActivityForResult(signInIntent, REQUEST_CODE_SIGN_IN);
+                }
             }
         });
+    }
 
-        try {
-            if (analyzer != null) {
-                analyzer.stop();
-            }
-        } catch (IOException e) {
-            // Exception handling.
-        }
+    /**
+     * Process the returned AuthAccount object to obtain the HUAWEI ID information.
+     *
+     * @param authAccount AuthAccount object, which contains the HUAWEI ID information.
+     */
+    private void dealWithResultOfSignIn(AuthAccount authAccount) {
+        Log.i(TAG, "idToken:" + authAccount.getIdToken());
+        // TODO: After obtaining the ID token, your app will send it to your app server if there is one. If you have no app server, your app will verify and parse the ID token locally.
+        Intent intent = new Intent(getApplicationContext(),MainMenu.class);
+        Bundle extras = new Bundle();
+        extras.putString("name",authAccount.getDisplayName());
+        extras.putString("mail",authAccount.getEmail());
+        extras.putString("access_token", authAccount.getAccessToken());
+        intent.putExtras(extras);
+        startActivity(intent);
 
     }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_SIGN_IN) {
+            Log.i(TAG, "onActivitResult of sigInInIntent, request code: " + REQUEST_CODE_SIGN_IN);
+            Task<AuthAccount> authAccountTask = AccountAuthManager.parseAuthResultFromIntent(data);
+            if (authAccountTask.isSuccessful()) {
+                // The sign-in is successful, and the authAccount object that contains the HUAWEI ID information is obtained.
+                AuthAccount authAccount = authAccountTask.getResult();
+                dealWithResultOfSignIn(authAccount);
+                Log.i(TAG, "onActivitResult of sigInInIntent, request code: " + REQUEST_CODE_SIGN_IN);
+            } else {
+                // The sign-in fails. Find the cause from the status code. For more information, please refer to Error Codes.
+                Log.e(TAG, "sign in failed : " +((ApiException)authAccountTask.getException()).getStatusCode());
+            }
+        }
+    }
 }
-
