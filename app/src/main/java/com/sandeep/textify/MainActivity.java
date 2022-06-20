@@ -108,11 +108,12 @@ public class MainActivity extends AppCompatActivity {
     private void dealWithResultOfSignIn(AuthAccount authAccount) {
         Log.i(TAG, "idToken:" + authAccount.getIdToken());
         // TODO: After obtaining the ID token, your app will send it to your app server if there is one. If you have no app server, your app will verify and parse the ID token locally.
+        String access = authAccount.getAccessToken();
         Intent intent = new Intent(getApplicationContext(),MainMenu.class);
         Bundle extras = new Bundle();
         extras.putString("name",authAccount.getDisplayName());
         extras.putString("mail",authAccount.getEmail());
-        extras.putString("access_token", authAccount.getAccessToken());
+        extras.putString("access_token", access);//authAccount.getAccessToken());
         intent.putExtras(extras);
         startActivity(intent);
 

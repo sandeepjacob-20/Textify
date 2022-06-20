@@ -33,6 +33,7 @@ public class TranscriptionActivity extends AppCompatActivity {
     private TextView resultTv;// = findViewById(R.id.result_tv);
     private TextView errorTv;// = findViewById(R.id.error_tv);
     //private String languageItem = LAN_EN_US;
+    String result;
     private Button start, stop, query;
     private Context context;
 
@@ -50,14 +51,15 @@ public class TranscriptionActivity extends AppCompatActivity {
         }
 
         String api = "DAEDAJPPUt4q9Yvt9vB7czlFN1fWa+mbxZK/KuxMY7zg9gjQuwgx3bfk3kN95PdEHiWLuQm0eRIb4lmO5YNSDq9Za0at+fOijcAVFA==";
-        String access_token = getIntent().getExtras().getString("access_token");
+        //String access_token = getIntent().getExtras().getString("access_token");
 
-        MLApplication.getInstance().setAccessToken(access_token);
+        //MLApplication.getInstance().setAccessToken(access_token);
         MLApplication.getInstance().setApiKey(api);
 
         start = findViewById(R.id.start_listen_btn);
         start.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
+                Toast.makeText(getApplicationContext(),"Recording started",Toast.LENGTH_SHORT).show();
                 start();
             }
         });
@@ -66,11 +68,15 @@ public class TranscriptionActivity extends AppCompatActivity {
         stop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Toast.makeText(getApplicationContext(),"Recording stopped",Toast.LENGTH_SHORT).show();
                 destroyRecognizer();
+                Intent intent = new Intent(getApplicationContext(),ResultActivity.class);
+                intent.putExtra("result",result);
+                startActivity(intent);
             }
         });
 
-        query = findViewById(R.id.query_languages_btn);
+        /*query = findViewById(R.id.query_languages_btn);
         query.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -89,7 +95,7 @@ public class TranscriptionActivity extends AppCompatActivity {
 
                         });
             }
-        });
+        });*/
     }
     /*private void initView() {
         findViewById(R.id.start_listen_btn).setOnClickListener((View.OnClickListener) this);
@@ -123,7 +129,7 @@ public class TranscriptionActivity extends AppCompatActivity {
                 return;
             }
             boolean isFinal = partialResults.getBoolean(MLSpeechRealTimeTranscriptionConstants.RESULTS_PARTIALFINAL);
-            String result = partialResults.getString(MLSpeechRealTimeTranscriptionConstants.RESULTS_RECOGNIZING);
+            result = partialResults.getString(MLSpeechRealTimeTranscriptionConstants.RESULTS_RECOGNIZING);
             if (TextUtils.isEmpty(result)) {
                 return;
             }
@@ -146,10 +152,9 @@ public class TranscriptionActivity extends AppCompatActivity {
                     }
                 }
                 recognizerResult.append(result);
-                errorTv.setText(recognizerResult.toString());
 
             } else {
-                Toast.makeText(getApplicationContext(),result,Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(),result,Toast.LENGTH_SHORT).show();
                 resultTv.setText(result);
             }
         }

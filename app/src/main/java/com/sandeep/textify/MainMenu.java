@@ -52,9 +52,9 @@ public class MainMenu extends AppCompatActivity {
         setContentView(R.layout.activity_main_menu);
         context = this;
 
-        access_token = getIntent().getExtras().getString("access_token");
+        //access_token = getIntent().getExtras().getString("access_token");
         //Toast.makeText(getApplicationContext(),access_token,Toast.LENGTH_SHORT).show();
-        api = "DAEDAJPPUt4q9Yvt9vB7czlFN1fWa+mbxZK/KuxMY7zg9gjQuwgx3bfk3kN95PdEHiWLuQm0eRIb4lmO5YNSDq9Za0at+fOijcAVFA==";
+        //api = "DAEDAJPPUt4q9Yvt9vB7czlFN1fWa+mbxZK/KuxMY7zg9gjQuwgx3bfk3kN95PdEHiWLuQm0eRIb4lmO5YNSDq9Za0at+fOijcAVFA==";
 
 
         capture = findViewById(R.id.capture);
@@ -82,7 +82,7 @@ public class MainMenu extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainMenu.this, TranscriptionActivity.class);
-                intent.putExtra("access_token",access_token);
+                //intent.putExtra("api",api);
                 startActivity(intent);
             }
         });
