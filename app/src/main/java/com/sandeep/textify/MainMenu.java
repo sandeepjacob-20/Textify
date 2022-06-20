@@ -16,7 +16,8 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 
 import android.view.View;
-import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.dhaval2404.imagepicker.ImagePicker;
@@ -25,41 +26,55 @@ import com.huawei.hmf.tasks.OnSuccessListener;
 
 import com.huawei.hmf.tasks.Task;
 import com.huawei.hms.mlsdk.MLAnalyzerFactory;
-import com.huawei.hms.mlsdk.common.MLApplication;
 import com.huawei.hms.mlsdk.common.MLFrame;
-import com.huawei.hms.mlsdk.speechrtt.MLSpeechRealTimeTranscription;
-import com.huawei.hms.mlsdk.speechrtt.MLSpeechRealTimeTranscriptionConfig;
-import com.huawei.hms.mlsdk.speechrtt.MLSpeechRealTimeTranscriptionConstants;
-import com.huawei.hms.mlsdk.speechrtt.MLSpeechRealTimeTranscriptionListener;
 import com.huawei.hms.mlsdk.text.MLLocalTextSetting;
 import com.huawei.hms.mlsdk.text.MLText;
 import com.huawei.hms.mlsdk.text.MLTextAnalyzer;
 
 
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
 
 public class MainMenu extends AppCompatActivity {
     private Context context;
-    private Button capture,transcribe;
+    private ImageButton capture,transcribe;
+    private TextView name_field,greeting_field;
     private static final int request_camera_code = 100;
     private static final int request_write_storage_code = 101;
     private static final int request_read_storage_code = 102;
     private Bitmap bitmap;
-    private String value,access_token,api;
+    private String value,name,greeting;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
         context = this;
 
-        //access_token = getIntent().getExtras().getString("access_token");
-        //Toast.makeText(getApplicationContext(),access_token,Toast.LENGTH_SHORT).show();
-        //api = "DAEDAJPPUt4q9Yvt9vB7czlFN1fWa+mbxZK/KuxMY7zg9gjQuwgx3bfk3kN95PdEHiWLuQm0eRIb4lmO5YNSDq9Za0at+fOijcAVFA==";
-
-
+        greeting_field = findViewById(R.id.greeting);
+        name_field = findViewById(R.id.name_layout);
         capture = findViewById(R.id.capture);
         transcribe = findViewById(R.id.transcription);
 
+        Date date = new Date();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        int hour = cal.get(Calendar.HOUR_OF_DAY);
+
+        if(hour>= 12 && hour < 17){
+            greeting = "Good Afternoon";
+        } else if(hour >= 17 && hour < 21){
+            greeting = "Good Evening";
+        } else if(hour >= 21 && hour < 24){
+            greeting = "Good Night";
+        } else {
+            greeting = "Good Morning";
+        }
+
+        name = getIntent().getExtras().getString("name");
+        name_field.setText(name);
+
+        greeting_field.setText(greeting);
 
         if(ContextCompat.checkSelfPermission(MainMenu.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions(MainMenu.this,new String[]{
@@ -82,7 +97,7 @@ public class MainMenu extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainMenu.this, TranscriptionActivity.class);
-                //intent.putExtra("api",api);
+                overridePendingTransition(R.anim.slide_to_left,R.anim.slide_from_right);
                 startActivity(intent);
             }
         });
@@ -137,6 +152,7 @@ public class MainMenu extends AppCompatActivity {
                 value = text.getStringValue();
                 Intent intent = new Intent(MainMenu.this,ResultActivity.class);
                 intent.putExtra("result",value);
+                overridePendingTransition(R.anim.slide_to_left,R.anim.slide_from_right);
                 startActivity(intent);
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -153,6 +169,5 @@ public class MainMenu extends AppCompatActivity {
             }
         } catch (IOException e) {
         }
-
     }
 }

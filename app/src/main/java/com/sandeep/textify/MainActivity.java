@@ -1,44 +1,23 @@
 package com.sandeep.textify;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
-import android.Manifest;
-import android.app.Activity;
-import android.content.Context;
+import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.Toast;
 
-
-import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.huawei.hmf.tasks.OnFailureListener;
 import com.huawei.hmf.tasks.OnSuccessListener;
 import com.huawei.hmf.tasks.Task;
 
 import com.huawei.hms.common.ApiException;
-import com.huawei.hms.mlsdk.MLAnalyzerFactory;
-import com.huawei.hms.mlsdk.common.MLFrame;
-import com.huawei.hms.mlsdk.text.MLLocalTextSetting;
-import com.huawei.hms.mlsdk.text.MLText;
-import com.huawei.hms.mlsdk.text.MLTextAnalyzer;
 import com.huawei.hms.support.account.AccountAuthManager;
 import com.huawei.hms.support.account.request.AccountAuthParams;
 import com.huawei.hms.support.account.request.AccountAuthParamsHelper;
 import com.huawei.hms.support.account.result.AuthAccount;
 import com.huawei.hms.support.account.service.AccountAuthService;
 import com.huawei.hms.support.api.entity.common.CommonConstant;
-
-import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
     private AccountAuthService mAuthService;
@@ -110,11 +89,8 @@ public class MainActivity extends AppCompatActivity {
         // TODO: After obtaining the ID token, your app will send it to your app server if there is one. If you have no app server, your app will verify and parse the ID token locally.
         String access = authAccount.getAccessToken();
         Intent intent = new Intent(getApplicationContext(),MainMenu.class);
-        Bundle extras = new Bundle();
-        extras.putString("name",authAccount.getDisplayName());
-        extras.putString("mail",authAccount.getEmail());
-        extras.putString("access_token", access);//authAccount.getAccessToken());
-        intent.putExtras(extras);
+        intent.putExtra("name",authAccount.getDisplayName());
+        overridePendingTransition(R.anim.slide_to_left,R.anim.slide_from_right);
         startActivity(intent);
 
     }

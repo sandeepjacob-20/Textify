@@ -10,6 +10,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -20,7 +21,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class ResultActivity extends AppCompatActivity {
-    private Button save,upload;
+    private Button save;
     private TextView result;
     private String value;
     @Override
@@ -30,23 +31,16 @@ public class ResultActivity extends AppCompatActivity {
 
         save = findViewById(R.id.save);
         result = findViewById(R.id.result);
-        upload = findViewById(R.id.upload);
 
         value = getIntent().getExtras().getString("result");
 
         result.setText(value);
+        result.setMovementMethod(new ScrollingMovementMethod());
 
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 createAndSaveFile();
-            }
-        });
-        upload.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //Intent intent = new Intent(ResultActivity.this,UploadActivity.class);
-                //startActivity(intent);
             }
         });
     }
@@ -57,7 +51,6 @@ public class ResultActivity extends AppCompatActivity {
         intent.setType("text/plain");
         intent.putExtra(Intent.EXTRA_TITLE,"new_doc.txt");
         someActivityResultLauncher.launch(intent);
-        //startActivityForResult(intent,1);
     }
 
     ActivityResultLauncher<Intent> someActivityResultLauncher = registerForActivityResult(
@@ -66,7 +59,6 @@ public class ResultActivity extends AppCompatActivity {
                 @Override
                 public void onActivityResult(ActivityResult result) {
                     if (result.getResultCode() == Activity.RESULT_OK) {
-                        // There are no request codes
                         Intent data = result.getData();
                         Uri uri = data.getData();
 

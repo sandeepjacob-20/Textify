@@ -13,7 +13,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,11 +30,10 @@ import java.util.List;
 
 public class TranscriptionActivity extends AppCompatActivity {
     private static final String TAG = TranscriptionActivity.class.getSimpleName();
-    private TextView resultTv;// = findViewById(R.id.result_tv);
-    private TextView errorTv;// = findViewById(R.id.error_tv);
-    //private String languageItem = LAN_EN_US;
+    private TextView resultTv;
+    private TextView errorTv;
     String result;
-    private Button start, stop, query;
+    private ImageButton start, stop;
     private Context context;
 
     private volatile StringBuffer recognizerResult = new StringBuffer();
@@ -45,15 +44,12 @@ public class TranscriptionActivity extends AppCompatActivity {
         context = this;
         resultTv = findViewById(R.id.result_tv);
         errorTv = findViewById(R.id.error_tv);
-        //initView();
         if (!allPermissionsGranted()) {
             getRuntimePermissions();
         }
 
         String api = "DAEDAJPPUt4q9Yvt9vB7czlFN1fWa+mbxZK/KuxMY7zg9gjQuwgx3bfk3kN95PdEHiWLuQm0eRIb4lmO5YNSDq9Za0at+fOijcAVFA==";
-        //String access_token = getIntent().getExtras().getString("access_token");
 
-        //MLApplication.getInstance().setAccessToken(access_token);
         MLApplication.getInstance().setApiKey(api);
 
         start = findViewById(R.id.start_listen_btn);
@@ -72,38 +68,12 @@ public class TranscriptionActivity extends AppCompatActivity {
                 destroyRecognizer();
                 Intent intent = new Intent(getApplicationContext(),ResultActivity.class);
                 intent.putExtra("result",result);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 startActivity(intent);
             }
         });
 
-        /*query = findViewById(R.id.query_languages_btn);
-        query.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MLSpeechRealTimeTranscription.getInstance()
-                        .getLanguages(new MLSpeechRealTimeTranscription.LanguageCallback() {
-                            @Override
-                            public void onResult(List<String> result) {
-                                Toast.makeText(TranscriptionActivity.this, result.toString(), Toast.LENGTH_SHORT).show();
-                                Log.i(TAG, "support languages==" + result.toString());
-                            }
-
-                            @Override
-                            public void onError(int errorCode, String errorMsg) {
-                                Log.e(TAG, "errorCode:" + errorCode + "errorMsg:" + errorMsg);
-                            }
-
-                        });
-            }
-        });*/
     }
-    /*private void initView() {
-        findViewById(R.id.start_listen_btn).setOnClickListener((View.OnClickListener) this);
-        findViewById(R.id.stop_listen_btn).setOnClickListener((View.OnClickListener) this);
-        findViewById(R.id.query_languages_btn).setOnClickListener((View.OnClickListener) this);
-        resultTv = findViewById(R.id.result_tv);
-        errorTv = findViewById(R.id.error_tv);
-    }*/
 
     protected class SpeechRecognitionListener implements MLSpeechRealTimeTranscriptionListener {
 
@@ -154,7 +124,6 @@ public class TranscriptionActivity extends AppCompatActivity {
                 recognizerResult.append(result);
 
             } else {
-                //Toast.makeText(getApplicationContext(),result,Toast.LENGTH_SHORT).show();
                 resultTv.setText(result);
             }
         }
@@ -237,35 +206,6 @@ public class TranscriptionActivity extends AppCompatActivity {
         Log.d(TAG, "isWordTimeOffsetEnable  " + config.isWordTimeOffsetEnable());
         Log.d(TAG, "isSentenceTimeOffsetEnable  " + config.isSentenceTimeOffsetEnable());
     }
-
-   /* public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.start_listen_btn:
-                start();
-                break;
-            case R.id.stop_listen_btn:
-                destroyRecognizer();
-                break;
-            case R.id.query_languages_btn:
-                MLSpeechRealTimeTranscription.getInstance()
-                        .getLanguages(new MLSpeechRealTimeTranscription.LanguageCallback() {
-                            @Override
-                            public void onResult(List<String> result) {
-                                Toast.makeText(TranscriptionActivity.this, result.toString(), Toast.LENGTH_SHORT).show();
-                                Log.i(TAG, "support languages==" + result.toString());
-                            }
-
-                            @Override
-                            public void onError(int errorCode, String errorMsg) {
-                                Log.e(TAG, "errorCode:" + errorCode + "errorMsg:" + errorMsg);
-                            }
-
-                        });
-                break;
-            default:
-                break;
-        }
-    } */
 
     @Override
     protected void onDestroy() {
