@@ -42,6 +42,9 @@
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
+        <meta-data
+            android:name="com.huawei.hms.client.channel.androidMarket"
+            android:value="false" />
     </application>
 
 </manifest>

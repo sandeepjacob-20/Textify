@@ -16,7 +16,7 @@ android {
         minSdk 21
         targetSdk 31
         versionCode 1
-        versionName "5.2"
+        versionName "5.2.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -44,7 +44,7 @@ dependencies {
     implementation 'com.huawei.hms:ml-computer-vision-ocr:3.5.0.304'
     implementation 'com.huawei.hms:ml-computer-vision-ocr-latin-model:3.5.0.304'
     implementation 'com.github.dhaval2404:imagepicker:2.1'
-    implementation 'com.huawei.hms:hwid:6.3.0.301'
+    implementation 'com.huawei.hms:hwid:6.4.0.301'
     implementation 'com.huawei.hms:ml-computer-voice-realtimetranscription:3.5.0.303'
 
 }
