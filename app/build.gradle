@@ -50,4 +50,7 @@ dependencies {
     implementation 'com.huawei.hms:ads-lite:13.4.54.300'
     implementation 'com.huawei.hms:ads-omsdk:1.3.0'
 
+    implementation 'com.huawei.hms:ml-computer-translate:3.5.0.302'
+    implementation 'com.huawei.hms:ml-computer-translate-model:3.5.0.302'
+
 }

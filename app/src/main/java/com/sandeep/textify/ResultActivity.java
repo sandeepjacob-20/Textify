@@ -18,21 +18,32 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.huawei.hmf.tasks.OnFailureListener;
+import com.huawei.hmf.tasks.OnSuccessListener;
+import com.huawei.hmf.tasks.Task;
 import com.huawei.hms.ads.AdListener;
 import com.huawei.hms.ads.AdParam;
 import com.huawei.hms.ads.banner.BannerView;
+import com.huawei.hms.mlsdk.common.MLApplication;
+import com.huawei.hms.mlsdk.model.download.MLModelDownloadListener;
+import com.huawei.hms.mlsdk.model.download.MLModelDownloadStrategy;
+import com.huawei.hms.mlsdk.translate.MLTranslateLanguage;
+import com.huawei.hms.mlsdk.translate.MLTranslatorFactory;
+import com.huawei.hms.mlsdk.translate.local.MLLocalTranslateSetting;
+import com.huawei.hms.mlsdk.translate.local.MLLocalTranslator;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Locale;
+import java.util.Set;
 
 public class ResultActivity extends AppCompatActivity {
     private static final String TAG = "destroyed";
-    private Button save;
-    private TextView result;
+    private Button save,translate;
+    private TextView result_window;
     private String value;
-
+    private String api = "DAEDAJPPUt4q9Yvt9vB7czlFN1fWa+mbxZK/KuxMY7zg9gjQuwgx3bfk3kN95PdEHiWLuQm0eRIb4lmO5YNSDq9Za0at+fOijcAVFA==";
     private BannerView bannerView;
 
 
@@ -40,6 +51,13 @@ public class ResultActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_result);
+        value = getIntent().getExtras().getString("result");
+        save = findViewById(R.id.save);
+        translate = findViewById(R.id.translate);
+        result_window = findViewById(R.id.result);
+
+        result_window.setText(value);
+        result_window.setMovementMethod(new ScrollingMovementMethod());
 
         bannerView = findViewById(R.id.hw_banner_view);
         bannerView.setAdId("testw6vs28auh3");
@@ -48,15 +66,80 @@ public class ResultActivity extends AppCompatActivity {
         bannerView.loadAd(adParam);
         bannerView.setAdListener(adListener);
 
+        MLApplication.getInstance().setApiKey(api);
 
+        translate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
-        save = findViewById(R.id.save);
-        result = findViewById(R.id.result);
+                MLLocalTranslateSetting setting = new MLLocalTranslateSetting.Factory()
+                        // Set the source language code. The ISO 639-1 standard is used. This parameter is mandatory. If this parameter is not set, an error may occur.
+                        .setSourceLangCode("en")
+                        // Set the target language code. The ISO 639-1 standard is used. This parameter is mandatory. If this parameter is not set, an error may occur.
+                        .setTargetLangCode("fr")
+                        .create();
 
-        value = getIntent().getExtras().getString("result");
+                final MLLocalTranslator mlLocalTranslator = MLTranslatorFactory.getInstance().getLocalTranslator(setting);
+                MLTranslateLanguage.getLocalAllLanguages().addOnSuccessListener(
+                        new OnSuccessListener<Set<String>>() {
+                            @Override
+                            public void onSuccess(Set<String> result) {
+                                Log.d("success","local language received");
+                                // Languages supported by on-device translation are successfully obtained.
+                            }
+                        });
 
-        result.setText(value);
-        result.setMovementMethod(new ScrollingMovementMethod());
+                MLModelDownloadStrategy downloadStrategy = new MLModelDownloadStrategy.Factory()
+                        //.needWifi() // It is recommended that you download the package in a Wi-Fi environment.
+                        .create();
+
+                MLModelDownloadListener modelDownloadListener = new MLModelDownloadListener() {
+                    @Override
+                    public void onProcess(long alreadyDownLength, long totalLength) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                // Display the download progress or perform other operations.
+                            }
+                        });
+                    }
+                };
+
+                mlLocalTranslator.preparedModel(downloadStrategy, modelDownloadListener).
+                        addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess (Void aVoid){
+                                Log.d("Model Download ","Model package Downloaded");
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure (Exception e){
+                        Log.d("Model Download ","Error downloading Model package");
+                        // Called when the model package fails to be downloaded.
+                    }
+                });
+
+                final Task<String> task = mlLocalTranslator.asyncTranslate(value);
+                task.addOnSuccessListener(new OnSuccessListener<String>() {
+                    @Override
+                    public void onSuccess(String s) {
+                        result_window.setText(s);
+                        value = s;
+                        // Processing logic for detection success.
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(Exception e) {
+                        // Processing logic for detection failure.
+                    }
+                });
+
+                if (mlLocalTranslator!= null) {
+                       mlLocalTranslator.stop();
+                }
+            }
+        });
+
 
         save.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -65,6 +148,7 @@ public class ResultActivity extends AppCompatActivity {
             }
         });
     }
+
     private AdListener adListener = new AdListener() {
         @Override
         public void onAdLoaded() {
