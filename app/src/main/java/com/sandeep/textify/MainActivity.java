@@ -86,7 +86,10 @@ public class MainActivity extends AppCompatActivity {
             Log.i(TAG,"code:"+authAccount.getAuthorizationCode());
             // TODO: After obtaining the authorization code, your app needs to send it to the app server.
             Intent intent = new Intent(getApplicationContext(),MainMenu.class);
-            intent.putExtra("name",authAccount.getDisplayName());
+            Bundle extras = new Bundle();
+            extras.putString("name",authAccount.getDisplayName());
+            extras.putString("avatar", String.valueOf(authAccount.getAvatarUri()));
+            intent.putExtras(extras);
             overridePendingTransition(R.anim.slide_to_left,R.anim.slide_from_right);
             startActivity(intent);
         }

@@ -17,9 +17,11 @@ import android.provider.MediaStore;
 
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.huawei.hmf.tasks.OnFailureListener;
 import com.huawei.hmf.tasks.OnSuccessListener;
@@ -44,7 +46,8 @@ public class MainMenu extends AppCompatActivity {
     private static final int request_write_storage_code = 101;
     private static final int request_read_storage_code = 102;
     private Bitmap bitmap;
-    private String value,name,greeting;
+    private String value,name,greeting,avatar;
+    private ImageView profile;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,6 +58,7 @@ public class MainMenu extends AppCompatActivity {
         name_field = findViewById(R.id.name_layout);
         capture = findViewById(R.id.capture);
         transcribe = findViewById(R.id.transcription);
+        profile = findViewById(R.id.pic);
 
         Date date = new Date();
         Calendar cal = Calendar.getInstance();
@@ -73,6 +77,10 @@ public class MainMenu extends AppCompatActivity {
 
         name = getIntent().getExtras().getString("name");
         name_field.setText(name);
+
+        avatar = getIntent().getExtras().getString("avatar");
+        //Toast.makeText(getApplicationContext(),avatar,Toast.LENGTH_SHORT).show();
+        Glide.with(this).load(avatar).into(profile);
 
         greeting_field.setText(greeting);
 

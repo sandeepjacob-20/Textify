@@ -53,4 +53,9 @@ dependencies {
     implementation 'com.huawei.hms:ml-computer-translate:3.5.0.302'
     implementation 'com.huawei.hms:ml-computer-translate-model:3.5.0.302'
 
+    implementation 'com.github.bumptech.glide:glide:4.13.2'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.13.2'
+
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
+
 }
