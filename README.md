@@ -15,8 +15,8 @@ DEVELOPMENT
 
 Textify uses the ML kit provided by HMS Core to recognize text from images. It uses an offline mdoel to detect the text. The app captures an image or loads an image from the 
 device and sends the image as an input to the model which returns the detected text as a string. This is then displayed in a TextView. This text can then be translated into 
-6 different languages. The translation is also done using the HMS ML Kit. A save button is provided for the user to save the text as a doc file. The model is downloaded when the app
-is used for the first time and then it can be used as and when required even if the device is not connected to the internet. Translation can also be done offline.
+6 different languages. The on-device translation is also done using the HMS ML Kit. A save button is provided for the user to save the text as a doc file. The model is downloaded when the app
+is used for the first time and then it can be used as and when required even if the device is not connected to the internet. Translation can also be done offline and the required components are dynamically downloaded when a language is used for the first time.
 
 Transcription also uses the HMS ML Kit. The transcription service uses real-time transcription and so it requires an active internet connection. The result of the transcription
 is also a string which is displayed and saved using the same TextView. 
@@ -33,6 +33,8 @@ HMS ML Kit : https://developer.huawei.com/consumer/en/hms/huawei-mlkit/
 Text Recognition using HMS ML kit : https://developer.huawei.com/consumer/en/doc/development/hiai-Guides/text-recognition-0000001050040053
 
 Transcription using HMS ML kit : https://developer.huawei.com/consumer/en/doc/development/hiai-Guides/real-time-transcription-0000001054964200
+
+On-device Translation using ML Kit : https://developer.huawei.com/consumer/en/doc/development/hiai-Guides/on-device-translation-0000001058271775
 
 HMS Account Kit : https://developer.huawei.com/consumer/en/hms/huawei-accountkit/
 
